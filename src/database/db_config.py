@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -23,17 +24,6 @@ class DBConfigInstance:
             in_db_config.PASSWORD, in_db_config.HOSTNAME, in_db_config.DATABASE
         )
 
-
-# DEBUG_CONFIG = DBConfigInstance(
-#     DBConfig(
-#         DBMS='postgresql',
-#         DRIVER='psycopg2',
-#         HOSTNAME='localhost',
-#         DATABASE='postgres',
-#         USERNAME='postgre',
-#         PASSWORD='postgres',
-#         config_name='debugging_config'
-#     ))
 
 DEBUG_CONFIG = DBConfigInstance(
     DBConfig(
