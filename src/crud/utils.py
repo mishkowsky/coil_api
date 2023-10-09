@@ -1,4 +1,4 @@
-from operator import and_
+from sqlalchemy import and_
 
 
 def combine_conditions_with_and(condition1, condition2):

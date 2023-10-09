@@ -1,23 +1,11 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from typing import Generic, Optional, TypeVar, Annotated
-
-from pydantic import BaseModel, model_validator, conint, Field
-
-
-# def convert_datetime_to_iso_8601(dt: datetime) -> str:
-#     return dt.strftime('%Y-%m-%dT%H:%M:%S')
-
-
-# def transform_to_utc_datetime(dt: datetime) -> datetime:
-#     return dt.astimezone(tz=timezone.utc)
+from pydantic import BaseModel, model_validator, Field
 
 
 class CoilBase(BaseModel):
     length: Annotated[int, Field(strict=True, gt=0)]
     weight: Annotated[int, Field(strict=True, gt=0)]
-
-    # class Config:
-    #     json_encoders = {datetime: convert_datetime_to_iso_8601}
 
 
 class CoilCreate(CoilBase):
@@ -32,7 +20,6 @@ class CoilUpdate(BaseModel):
     deleted_at: datetime
 
 
-# Properties shared by models stored in DB
 class CoilInDBBase(CoilBase):
     id: Optional[int] = None
     created_at: datetime
@@ -42,12 +29,10 @@ class CoilInDBBase(CoilBase):
         from_attributes = True
 
 
-# Properties to return to client
 class Coil(CoilInDBBase, BaseModel):
     pass
 
 
-# Properties stored in DB
 class CoilInDB(CoilInDBBase):
     pass
 

@@ -55,9 +55,6 @@ class CRUDCoil(CRUDBase[Coil, CoilCreate, CoilUpdate]):
         filter_condition = not_(or_(self.model.created_at > end_date,
                                     and_(self.model.deleted_at < start_date, self.model.deleted_at != None)))
 
-        # coil_by_filter = db.query(self.model).filter(filter_condition).all()
-        # print(len(coil_by_filter))
-
         res = db.query(
             func.max(self.model.weight).label('max_weight'),
             func.min(self.model.weight).label('min_weight'),
