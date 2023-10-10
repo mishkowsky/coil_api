@@ -33,10 +33,6 @@ class Coil(CoilInDBBase, BaseModel):
     pass
 
 
-class CoilInDB(CoilInDBBase):
-    pass
-
-
 T = TypeVar("T", int, datetime)
 
 

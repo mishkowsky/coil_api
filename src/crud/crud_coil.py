@@ -3,50 +3,19 @@ from typing import List, Type
 from sqlalchemy import and_, func, or_, cast, Float, not_
 from sqlalchemy.orm import Session
 from src.crud.base import CRUDBase
-from src.crud.utils import combine_conditions_with_and
+from src.crud.utils import add_range_condition
 from src.database.model import Coil
 from src.schemas.coil import CoilCreate, CoilUpdate, GetCoilRequestBody, StatResponseBody
 
 
 class CRUDCoil(CRUDBase[Coil, CoilCreate, CoilUpdate]):
 
-    def get_by_period(self, db: Session, start_time: datetime, end_time: datetime) -> List[Type[Coil]]:
-        return db.query(self.model).filter(self.model.created_at < end_time or self.model.deleted_at > start_time).all()
-
     def get_coils_by_ranges(self, db: Session, request: GetCoilRequestBody) -> List[Type[Coil]]:
-
-        condition = None
-
-        if request.id_range is not None:
-            id_condition = and_(
-                request.id_range.start <= self.model.id,
-                self.model.id <= request.id_range.end
-            )
-            condition = combine_conditions_with_and(condition, id_condition)
-        if request.weight_range is not None:
-            weight_condition = and_(
-                request.weight_range.start <= self.model.weight,
-                self.model.weight <= request.weight_range.end
-            )
-            condition = combine_conditions_with_and(condition, weight_condition)
-        if request.length_range is not None:
-            length_condition = and_(
-                request.length_range.start <= self.model.length,
-                self.model.length <= request.length_range.end
-            )
-            condition = combine_conditions_with_and(condition, length_condition)
-        if request.created_at_range is not None:
-            created_at_condition = and_(
-                request.created_at_range.start <= self.model.created_at,
-                self.model.created_at <= request.created_at_range.end
-            )
-            condition = combine_conditions_with_and(condition, created_at_condition)
-        if request.deleted_at_range is not None:
-            deleted_at_condition = and_(
-                request.deleted_at_range.start <= self.model.deleted_at,
-                self.model.deleted_at <= request.deleted_at_range.end
-            )
-            condition = combine_conditions_with_and(condition, deleted_at_condition)
+        condition = add_range_condition(None, request.id_range, self.model.id)
+        condition = add_range_condition(condition, request.weight_range, self.model.weight)
+        condition = add_range_condition(condition, request.length_range, self.model.length)
+        condition = add_range_condition(condition, request.created_at_range, self.model.created_at)
+        condition = add_range_condition(condition, request.deleted_at_range, self.model.deleted_at)
         result = db.query(self.model).filter(condition).all()
         return result
 
@@ -67,6 +36,7 @@ class CRUDCoil(CRUDBase[Coil, CoilCreate, CoilUpdate]):
 
             func.max(self.model.deleted_at - self.model.created_at).
             filter(self.model.deleted_at is not None).label('max_period'),
+
             func.min(self.model.deleted_at - self.model.created_at).
             filter(self.model.deleted_at is not None).label('min_period'),
 
