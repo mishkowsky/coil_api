@@ -9,7 +9,7 @@ RUN apt-get -y install libpq-dev gcc
 RUN pip install --upgrade pip
 
 # set work directory
-WORKDIR /app
+WORKDIR /src
 
 # set env variables
 ENV PYTHONDONTWRITEBYTECODE 1
