@@ -4,10 +4,14 @@ from pytest_postgresql.janitor import DatabaseJanitor
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import sessionmaker
 import src
-from src.database.model import Coil, Base
+from src.database.model import Base
+from pytest_postgresql import factories
+from src.schemas.coil import Coil
+
+test_db = factories.postgresql_proc(port=None, dbname="test_db")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def db_session(test_db):
     pg_host = test_db.host
     pg_port = test_db.port
@@ -25,7 +29,7 @@ def db_session(test_db):
             yield sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def create_test_data(db_session):
 
     date_format = '%Y-%m-%d %H:%M:%S.%f'
@@ -45,11 +49,21 @@ def create_test_data(db_session):
         Coil(length=23, weight=12,
              created_at=datetime.strptime('2023-10-08 11:11:28.658098', date_format),
              deleted_at=datetime.strptime('2023-10-08 11:11:34.68338', date_format)),
+        Coil(length=100, weight=120,
+             created_at=datetime.strptime('2023-10-05 11:11:28.658098', date_format),
+             deleted_at=datetime.strptime('2023-10-05 11:11:34.68338', date_format)),
+        Coil(length=50, weight=60,
+             created_at=datetime.strptime('2023-10-05 11:11:28.658098', date_format),
+             deleted_at=datetime.strptime('2023-10-09 11:11:34.68338', date_format)),
     ]
 
     session = db_session()
     for obj in test_objs:
-        session.add(obj)
+        db_coil = src.database.model.Coil(length=obj.length, weight=obj.weight,
+                                          created_at=obj.created_at, deleted_at=obj.deleted_at)
+        session.add(db_coil)
+        session.flush()
+        obj.id = db_coil.id
     session.commit()
 
     return test_objs
