@@ -8,9 +8,6 @@ RUN apt-get update && apt-get -y install
 RUN apt-get -y install libpq-dev gcc
 RUN pip install --upgrade pip
 
-# set work directory
-WORKDIR /src
-
 # set env variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1

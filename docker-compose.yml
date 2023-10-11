@@ -4,8 +4,6 @@ services:
   web:
     build: .
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn src.router:app --host 0.0.0.0'
-    volumes:
-      - .:/app
     ports:
       - 8008:8000
     depends_on:
